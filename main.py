@@ -14,6 +14,7 @@ class Player:
     '''
     x = 0
     y = 0
+    shape = (60,60)
     speed = 5
     image = None
     last_shot_time = 0
@@ -23,7 +24,12 @@ class Player:
         self.x = x
         self.y = y
         self.shape = shape
-        
+
+    def move_to_start_pos(self, window_width, window_height):
+        '''Move to default starting position'''
+        self.x = int(window_width/10)
+        self.y = int(window_height/2) - self.shape[1]/2
+
     def appearance(self, image):
         '''Default graphic for player'''
         self.image = pygame.image.load(image).convert()
@@ -113,6 +119,7 @@ class App:
         self._running = False
 
         self.player = Player(0, 0, (60,60))
+        self.player.move_to_start_pos(self.window_width, self.window_height)
         self.player_bullets = Bullets(100, np.array([20,0]))
     
     def on_init(self):
@@ -141,7 +148,7 @@ class App:
         self._display_surf.fill((0,0,0))
         self.player_bullets.draw(self._display_surf, (0, self.window_width), (0, self.window_height))
         self.player.draw(self._display_surf)
-        
+
         pygame.display.flip()
         
     def on_cleanup(self):
