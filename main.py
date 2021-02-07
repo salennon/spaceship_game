@@ -10,7 +10,6 @@ import itertools
 
 '''
 To do:
-Prevent player from moving off screen
 Add a basic enemy type + collision detection
 Unit testing
 '''
@@ -30,10 +29,11 @@ class Player:
     x_bounds = (0, 1080)
     y_bounds = (0, 600)
 
-    def __init__(self, x, y, shape):
+    def __init__(self, x, y, shape, image):
         self.x = x
         self.y = y
         self.shape = shape
+        self.image = image
 
     def move_to_start_pos(self):
         '''Move to default starting position'''
@@ -41,8 +41,8 @@ class Player:
         self.y = int(self.y_bounds[1]/2) - self.shape[1]/2
 
     def appearance(self, image):
-        '''Default graphic for player'''
-        self.image = pygame.image.load(image).convert()
+        '''Load graphic from file'''
+        self.image = pygame.image.load(image).convert_alpha()
 
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
@@ -79,7 +79,7 @@ class Bullets:
     speed = np.array([0,0])
     bullet_size = (50, 10)
 
-    def __init__(self, max_bullets, speed):
+    def __init__(self, max_bullets, speed, image):
         '''
         Speed should be a numpy array: [x_speed, y_speed]
         '''
@@ -92,9 +92,12 @@ class Bullets:
         #Iterator to cycle through bullet indices
         self.bullet_cycler = itertools.cycle(range(len(self.locations)))
 
+        #Image for each bullet
+        self.image = image
+
     def appearance(self, image):
-        '''Default graphic for each bullet'''
-        self.image = pygame.image.load(image).convert()
+        '''Load graphic from file'''
+        self.image = pygame.image.load(image).convert_alpha()
     
     def add_bullet(self, x, y):
         '''Add bullet at x,y'''
@@ -105,20 +108,55 @@ class Bullets:
     def update(self):
         self.locations = self.locations + self.speed
 
-    def draw(self, surface, x_region, y_region):
+    def draw(self, surface):
         '''
-        Draw bullets within a given x and y region. x_region and y_region should be tuples.
-        Note: need to investigate efficiency of drawing all bullets vs filtering numpy array and drawing some
+        Draw bullets
         '''
-        # lower_filter = self.locations > np.array([x_region[0], y_region[0]])
-        # upper_filter = self.locations < np.array([x_region[1], y_region[1]])
-        # region_filter = lower_filter * upper_filter
-        # draw_locations = self.locations[region_filter]
-
         for loc in self.locations:
             surface.blit(self.image, loc)
 
 
+class EnemyCircles:
+    '''
+    Handle a wave of circle-type enemies using numpy arrays
+    '''
+    yvel_spread = 2
+    xvel_spread = 1
+
+    def __init__(self, num_enemies, x_spawn_region, y_spawn_region, avg_velocity, image):
+        '''
+        Generate a wave of num_enemies circle enemies in a spawn region specifed by x_spawn_region and y_spawn_region
+        '''
+        self.num_enemies = num_enemies
+
+        #Generate at random positions within spawn region
+        xpos = np.random.randint(x_spawn_region[0], x_spawn_region[1], size = self.num_enemies)
+        ypos = np.random.randint(y_spawn_region[0], y_spawn_region[1], size = self.num_enemies)
+        self.locations = np.vstack((xpos, ypos)).transpose()
+
+        #Assign velocity to each circle, giving a random spread
+        xvel = np.random.randint(avg_velocity[0] - self.xvel_spread,
+                 avg_velocity[0] + self.xvel_spread, size = self.num_enemies)
+        yvel = np.random.randint(avg_velocity[1] - self.yvel_spread,
+                 avg_velocity[1] + self.yvel_spread, size = self.num_enemies)
+        self.velocities = np.vstack((xvel, yvel)).transpose()
+
+        #Image for each circle
+        self.image = image
+
+    def appearance(self, image):
+        '''Default graphic for each circle'''
+        self.image = pygame.image.load(image).convert_alpha()
+
+    def update(self):
+        self.locations = self.locations + self.velocities
+
+    def draw(self, surface):
+        for loc in self.locations:
+            surface.blit(self.image, loc)
+ 
+
+    
 
 class App:
     '''
@@ -127,16 +165,12 @@ class App:
     
     window_width = 1080
     window_height = 600
+    last_spawn = 0
+    enemies = []
     
     def __init__(self):
         self._display_surf = None
         self._running = False
-
-        self.player = Player(0, 0, (60,60))
-        self.player.x_bounds = (0, self.window_width)
-        self.player.y_bounds = (0, self.window_height)
-        self.player.move_to_start_pos()
-        self.player_bullets = Bullets(20, np.array([20,0]))
     
     def on_init(self):
         pygame.init()
@@ -146,9 +180,18 @@ class App:
         self._display_surf = pygame.display.set_mode((self.window_width,\
                                     self.window_height), pygame.HWSURFACE)
 
-        #Set graphics for various objects
-        self.player.appearance('graphics/ship.png')
-        self.player_bullets.appearance('graphics/player_bullet.png')
+        #Load in graphics
+        self.player_graphic = pygame.image.load('graphics/ship.png').convert_alpha()
+        self.player_bullet_graphic = pygame.image.load('graphics/player_bullet.png').convert_alpha()
+        self.enemy_circle_graphic = pygame.image.load('graphics/circle.png').convert_alpha()
+ 
+        #Player instance, properties etc.
+        self.player = Player(0, 0, (60,60), self.player_graphic)
+        self.player.x_bounds = (0, self.window_width)
+        self.player.y_bounds = (0, self.window_height)
+        self.player.move_to_start_pos()
+
+        self.player_bullets = Bullets(20, np.array([20,0]), self.player_bullet_graphic)
 
         self.game_clock = pygame.time.Clock()
         self._running = True
@@ -158,12 +201,26 @@ class App:
             self._running = False
             
     def on_loop(self):     
+        #Compute positions
         self.player_bullets.update()
+
+        for enemy in self.enemies:
+            enemy.update()
+
+        #Spawn enemies
+        if pygame.time.get_ticks() - self.last_spawn > 2000:
+            self.enemies.append(EnemyCircles(10, (1080, 1200), (200,400), (-2,0), self.enemy_circle_graphic))
+            self.last_spawn = pygame.time.get_ticks()
     
     def on_render(self):
         self._display_surf.fill((0,0,0))
-        self.player_bullets.draw(self._display_surf, (0, self.window_width), (0, self.window_height))
+        self.player_bullets.draw(self._display_surf)
         self.player.draw(self._display_surf)
+
+        #Render enemies
+        #NEED BETTER WAY OF DEALING WITH THIS - LIST WILL KEEP GROWING WITH EACH WAVE
+        for enemy in self.enemies:
+            enemy.draw(self._display_surf)
 
         pygame.display.flip()
         
