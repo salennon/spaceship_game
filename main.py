@@ -14,14 +14,16 @@ class Player:
     '''
     x = 0
     y = 0
-    speed = 3
+    speed = 5
     image = None
+    last_shot_time = 0
+    shot_delay = 100
 
     def __init__(self, x, y, shape):
         self.x = x
         self.y = y
         self.shape = shape
-
+        
     def appearance(self, image):
         '''Default graphic for player'''
         self.image = pygame.image.load(image).convert()
@@ -41,15 +43,21 @@ class Player:
     def move_down(self):
         self.y = self.y + self.speed
 
-    def shoot(self, bullets):
-        #Shoot a bullet
-        bullets.add_bullet(self.x + self.shape[0]/2, self.y + self.shape[1]/2)
+    def shoot(self, bullets, current_time):
+
+        #Shoot a bullet if enough time has passed since last shot
+        if current_time - self.last_shot_time > self.shot_delay:
+            bullets.add_bullet(self.x + self.shape[0]/2, self.y + self.shape[1]/2 - bullets.bullet_size[1]/2)
+
+            #Update record of last shot
+            self.last_shot_time = current_time
 
 class Bullets:
     '''
     Handle multiple bullets using numpy arrays
     '''
     speed = np.array([0,0])
+    bullet_size = (50, 10)
 
     def __init__(self, max_bullets, speed):
         '''
@@ -105,7 +113,7 @@ class App:
         self._running = False
 
         self.player = Player(0, 0, (60,60))
-        self.player_bullets = Bullets(100, np.array([10,0]))
+        self.player_bullets = Bullets(100, np.array([20,0]))
     
     def on_init(self):
         pygame.init()
@@ -119,6 +127,7 @@ class App:
         self.player.appearance('graphics/ship.png')
         self.player_bullets.appearance('graphics/player_bullet.png')
 
+        self.game_clock = pygame.time.Clock()
         self._running = True
         
     def on_event(self, event):
@@ -130,8 +139,9 @@ class App:
     
     def on_render(self):
         self._display_surf.fill((0,0,0))
-        self.player.draw(self._display_surf)
         self.player_bullets.draw(self._display_surf, (0, self.window_width), (0, self.window_height))
+        self.player.draw(self._display_surf)
+        
         pygame.display.flip()
         
     def on_cleanup(self):
@@ -161,15 +171,14 @@ class App:
                 self.player.move_down()
 
             if(keys[K_SPACE]):
-                self.player.shoot(self.player_bullets)
+                self.player.shoot(self.player_bullets, pygame.time.get_ticks())
                 
             if(keys[K_ESCAPE]):
                 self._running = False
 
-
             self.on_loop()
             self.on_render()
-            time.sleep(0.01)
+            self.game_clock.tick(60)
             
         self.on_cleanup()
 
