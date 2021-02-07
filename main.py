@@ -8,6 +8,14 @@ import time
 import numpy as np
 import itertools
 
+'''
+To do:
+Prevent player from moving off screen
+Add a basic enemy type + collision detection
+Unit testing
+'''
+
+
 class Player:
     '''
     Player spaceship
@@ -19,16 +27,18 @@ class Player:
     image = None
     last_shot_time = 0
     shot_delay = 100
+    x_bounds = (0, 1080)
+    y_bounds = (0, 600)
 
     def __init__(self, x, y, shape):
         self.x = x
         self.y = y
         self.shape = shape
 
-    def move_to_start_pos(self, window_width, window_height):
+    def move_to_start_pos(self):
         '''Move to default starting position'''
-        self.x = int(window_width/10)
-        self.y = int(window_height/2) - self.shape[1]/2
+        self.x = int(self.x_bounds[1]/10)
+        self.y = int(self.y_bounds[1]/2) - self.shape[1]/2
 
     def appearance(self, image):
         '''Default graphic for player'''
@@ -38,16 +48,20 @@ class Player:
         surface.blit(self.image, (self.x, self.y))
     
     def move_right(self):
-        self.x = self.x + self.speed
+        if self.x + self.speed < self.x_bounds[1] - self.shape[0]:
+            self.x = self.x + self.speed
  
     def move_left(self):
-        self.x = self.x - self.speed
+        if self.x - self.speed > self.x_bounds[0]:
+            self.x = self.x - self.speed
         
     def move_up(self):
-        self.y = self.y - self.speed
+        if self.y - self.speed > self.y_bounds[0] - self.shape[1]/2:
+            self.y = self.y - self.speed
         
     def move_down(self):
-        self.y = self.y + self.speed
+        if self.y + self.speed < self.y_bounds[1] - self.shape[1]/2:
+            self.y = self.y + self.speed
 
     def shoot(self, bullets, current_time):
 
@@ -119,7 +133,9 @@ class App:
         self._running = False
 
         self.player = Player(0, 0, (60,60))
-        self.player.move_to_start_pos(self.window_width, self.window_height)
+        self.player.x_bounds = (0, self.window_width)
+        self.player.y_bounds = (0, self.window_height)
+        self.player.move_to_start_pos()
         self.player_bullets = Bullets(20, np.array([20,0]))
     
     def on_init(self):
@@ -164,7 +180,7 @@ class App:
             keys = pygame.key.get_pressed()
             
             #Handle key presses
-                        #Handle key presses
+    
             if(keys[K_d]):
                 self.player.move_right()
                 
