@@ -122,6 +122,7 @@ class EnemyCircles:
     '''
     yvel_spread = 2
     xvel_spread = 1
+    shape = (60,60)
 
     def __init__(self, num_enemies, x_spawn_region, y_spawn_region, avg_velocity, image):
         '''
@@ -154,7 +155,18 @@ class EnemyCircles:
     def draw(self, surface):
         for loc in self.locations:
             surface.blit(self.image, loc)
- 
+    
+    def on_screen(self, window_width, window_height):
+        '''Return False if none of the enemies in the wave are on screen, True otherwise'''
+        #Use an area slightly bigger than window to prevent freshly spawned waves being deleted
+        in_width = (self.locations[:,0] > -200) * (self.locations[:,0] < window_width + 200)
+        in_height = (self.locations[:,1] > -200) * (self.locations[:,1] < window_height + 200)
+        in_bounds = in_width*in_height
+        
+        if True in in_bounds:
+            return True
+        else:
+            return False
 
     
 
@@ -166,6 +178,7 @@ class App:
     window_width = 1080
     window_height = 600
     last_spawn = 0
+    last_flush = 0
     enemies = []
     
     def __init__(self):
@@ -207,10 +220,25 @@ class App:
         for enemy in self.enemies:
             enemy.update()
 
+        #Check for off-screen enemies to remove from memory/processing
+        if pygame.time.get_ticks() - self.last_spawn > 2000:
+            self.flush_enemies()
+            self.last_flush = pygame.time.get_ticks()
+        
         #Spawn enemies
         if pygame.time.get_ticks() - self.last_spawn > 2000:
             self.enemies.append(EnemyCircles(10, (1080, 1200), (200,400), (-2,0), self.enemy_circle_graphic))
             self.last_spawn = pygame.time.get_ticks()
+
+
+    def flush_enemies(self):
+        '''Remove enemies no longer on the screen'''
+        enemies_to_keep = []
+        for enemy in self.enemies:
+            if enemy.on_screen(self.window_width, self.window_height) == True:
+                enemies_to_keep.append(enemy)
+        
+        self.enemies = enemies_to_keep
     
     def on_render(self):
         self._display_surf.fill((0,0,0))
@@ -218,7 +246,6 @@ class App:
         self.player.draw(self._display_surf)
 
         #Render enemies
-        #NEED BETTER WAY OF DEALING WITH THIS - LIST WILL KEEP GROWING WITH EACH WAVE
         for enemy in self.enemies:
             enemy.draw(self._display_surf)
 
