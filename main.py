@@ -10,7 +10,7 @@ import itertools
 
 '''
 To do:
-Add a basic enemy type + collision detection
+Add collison detection
 Unit testing
 '''
 
@@ -221,12 +221,12 @@ class App:
             enemy.update()
 
         #Check for off-screen enemies to remove from memory/processing
-        if pygame.time.get_ticks() - self.last_spawn > 2000:
+        if (pygame.time.get_ticks() - self.last_flush) > 10000:
             self.flush_enemies()
             self.last_flush = pygame.time.get_ticks()
         
         #Spawn enemies
-        if pygame.time.get_ticks() - self.last_spawn > 2000:
+        if pygame.time.get_ticks() - self.last_spawn > 1000:
             self.enemies.append(EnemyCircles(10, (1080, 1200), (200,400), (-2,0), self.enemy_circle_graphic))
             self.last_spawn = pygame.time.get_ticks()
 
