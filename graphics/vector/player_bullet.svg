@@ -9,14 +9,14 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="60"
-   height="60"
-   viewBox="0 0 60.000001 60.000001"
+   width="50"
+   height="10"
+   viewBox="0 0 50.000001 10"
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="ship.svg"
-   inkscape:export-filename="C:\Users\Stephen\Documents\python\games\sidescrolling_shooter\graphics\ship.png"
+   sodipodi:docname="player_bullet.svg"
+   inkscape:export-filename="C:\Users\Stephen\Documents\python\games\sidescrolling_shooter\graphics\player_bullet.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -27,7 +27,7 @@
        is_visible="true"
        offset_points="0,0.5"
        sort_points="true"
-       interpolator_type="CubicBezierJohan"
+       interpolator_type="Linear"
        interpolator_beta="0.2"
        start_linecap_type="zerowidth"
        linejoin_type="round"
@@ -43,8 +43,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.6"
-     inkscape:cx="-14.159022"
-     inkscape:cy="21.764744"
+     inkscape:cx="10.126692"
+     inkscape:cy="5.5147405"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -53,10 +53,16 @@
      inkscape:window-height="705"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
-     inkscape:window-maximized="1">
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0">
     <inkscape:grid
        type="xygrid"
-       id="grid4196" />
+       id="grid4196"
+       originx="-2.5"
+       originy="-23.392861" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -66,7 +72,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -74,7 +80,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-992.36216)">
+     transform="translate(-2.5,-1018.9693)">
     <path
        sodipodi:type="star"
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.66535437;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
@@ -93,10 +99,12 @@
        inkscape:transform-center-x="-10.000002"
        transform="matrix(1.1561147,0,0,1.0012247,-93.823393,41.432124)"
        inkscape:transform-center-y="3.1292474e-005" />
-    <path
-       style="fill:#ffffff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 0,992.36216 60,30.00004 -60,30 20,-30 -20,-30.00004"
-       id="path4200"
-       inkscape:connector-curvature="0" />
+    <ellipse
+       style="fill:#ff6600;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4202"
+       cx="27.5"
+       cy="1023.9693"
+       rx="25"
+       ry="5" />
   </g>
 </svg>

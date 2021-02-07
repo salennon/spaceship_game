@@ -1,0 +1,1 @@
+Development on basic side-scrolling shooter spaceship game, using pygame.
