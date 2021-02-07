@@ -53,7 +53,7 @@ class Player:
 
         #Shoot a bullet if enough time has passed since last shot
         if current_time - self.last_shot_time > self.shot_delay:
-            bullets.add_bullet(self.x + self.shape[0]/2, self.y + self.shape[1]/2 - bullets.bullet_size[1]/2)
+            bullets.add_bullet(self.x + self.shape[0]/1.5, self.y + self.shape[1]/2 - bullets.bullet_size[1]/2)
 
             #Update record of last shot
             self.last_shot_time = current_time
@@ -120,7 +120,7 @@ class App:
 
         self.player = Player(0, 0, (60,60))
         self.player.move_to_start_pos(self.window_width, self.window_height)
-        self.player_bullets = Bullets(100, np.array([20,0]))
+        self.player_bullets = Bullets(20, np.array([20,0]))
     
     def on_init(self):
         pygame.init()
