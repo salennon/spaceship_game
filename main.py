@@ -16,9 +16,7 @@ Unit testing
 
 
 class Player:
-    '''
-    Player spaceship
-    '''
+    '''Player spaceship'''
     x = 0
     y = 0
     shape = (60,60)
@@ -29,12 +27,12 @@ class Player:
     x_bounds = (0, 1080)
     y_bounds = (0, 600)
 
-    def __init__(self, x, y, shape, image):
+    def __init__(self, x, y, image, hitbox):
         self.x = x
         self.y = y
-        self.shape = shape
         self.image = image
         self.shape = image.get_size()
+        self.hitbox = hitbox
 
     def move_to_start_pos(self):
         '''Move to default starting position'''
@@ -74,13 +72,11 @@ class Player:
             self.last_shot_time = current_time
 
 class Bullets:
-    '''
-    Handle multiple bullets using numpy arrays
-    '''
+    '''Handle multiple bullets using numpy arrays'''
     speed = np.array([0,0])
     bullet_size = (50, 10)
 
-    def __init__(self, max_bullets, speed, image):
+    def __init__(self, max_bullets, speed, image, hitbox):
         '''
         Speed should be a numpy array: [x_speed, y_speed]
         '''
@@ -96,6 +92,8 @@ class Bullets:
         #Image for each bullet
         self.image = image
         self.bullet_size = image.get_size()
+
+        self.hitbox = hitbox
 
     def appearance(self, image):
         '''Load graphic from file'''
@@ -119,18 +117,20 @@ class Bullets:
 
 
 class EnemyCircles:
-    '''
-    Handle a wave of circle-type enemies using numpy arrays
-    '''
+    '''Handle a wave of circle-type enemies using numpy arrays'''
     yvel_spread = 2
     xvel_spread = 1
     shape = (60,60)
+    health_per_enemy = 1
 
-    def __init__(self, num_enemies, x_spawn_region, y_spawn_region, avg_velocity, image):
+    def __init__(self, num_enemies, x_spawn_region, y_spawn_region, avg_velocity, image, hitbox):
         '''
         Generate a wave of num_enemies circle enemies in a spawn region specifed by x_spawn_region and y_spawn_region
         '''
         self.num_enemies = num_enemies
+
+        #Generate health for each enemy in wave
+        self.health = np.full(self.num_enemies, self.health_per_enemy)
 
         #Generate at random positions within spawn region
         xpos = np.random.randint(x_spawn_region[0], x_spawn_region[1], size = self.num_enemies)
@@ -148,6 +148,8 @@ class EnemyCircles:
         self.image = image
         self.shape = image.get_size()
 
+        self.hitbox = hitbox
+
     def appearance(self, image):
         '''Default graphic for each circle'''
         self.image = pygame.image.load(image).convert_alpha()
@@ -160,7 +162,10 @@ class EnemyCircles:
             surface.blit(self.image, loc)
     
     def on_screen(self, window_width, window_height):
-        '''Return False if none of the enemies in the wave are on screen, True otherwise'''
+        '''
+        Return False if none of the enemies in the wave are on screen, True otherwise
+        Note: consider giving this x dependence only
+        '''
         #Use an area slightly bigger than window to prevent freshly spawned waves being deleted
         in_width = (self.locations[:,0] > -200) * (self.locations[:,0] < window_width + 200)
         in_height = (self.locations[:,1] > -200) * (self.locations[:,1] < window_height + 200)
@@ -170,13 +175,62 @@ class EnemyCircles:
             return True
         else:
             return False
+    
+    def take_damage(self, collisions, damage_amount):
+        '''
+        Make enemies take damage based on collisions
+        '''
+        damage_taken = collisions*damage_amount
+        self.health = self.health - damage_taken
 
+        #Check for dead enemies
+        dead_enemies = self.health < 1
+        self.locations[dead_enemies, :] = np.array([-1000,-1000])
+
+class Game:
+    ''' Handle game logic'''
+
+    def __init__(self):
+        pass
+
+    def detect_bullet_collision(self, bullets, enemy):
+        ''' 
+        Detect collision between player bullets and wave of enemies
+        Returns boolean array with True values for collisions
+        '''
+
+        #Define upper and lower limits for hitbox collision
+        # lower_limit = np.array([enemy.hitbox[0][0] - bullets.hitbox[0][1], 
+        #                         enemy.hitbox[1][0] - bullets.hitbox[1][1]])
+        # upper_limit = np.array([enemy.hitbox[0][1] - bullets.hitbox[0][0], 
+        #                         enemy.hitbox[1][1] - bullets.hitbox[1][0]])
+
+        x_lower_limit = enemy.hitbox[0][0] - bullets.hitbox[0][1]
+        y_lower_limit = enemy.hitbox[1][0] - bullets.hitbox[1][1]
+        x_upper_limit = enemy.hitbox[0][1] - bullets.hitbox[0][0]
+        y_upper_limit =  enemy.hitbox[1][1] - bullets.hitbox[1][0]
+        
+        collisions = np.full(len(enemy.locations), False)
+
+        for i, enemy_loc in enumerate(enemy.locations):
+            proximity = bullets.locations - enemy_loc
+            x_proximity = proximity[:,0]
+            y_proximity = proximity[:,1]
+
+            #Detect collisions
+            x_collision = (x_proximity > x_lower_limit)*(x_proximity < x_upper_limit)
+            y_collision = (y_proximity > y_lower_limit)*(y_proximity < y_upper_limit)
+
+            is_collision = x_collision*y_collision
+
+            if True in is_collision:
+                collisions[i] = True
+        
+        return collisions
     
 
 class App:
-    '''
-    Application loops
-    '''
+    '''Application loops'''
     
     window_width = 1080
     window_height = 600
@@ -202,12 +256,15 @@ class App:
         self.enemy_circle_graphic = pygame.image.load('graphics/circle.png').convert_alpha()
  
         #Player instance, properties etc.
-        self.player = Player(0, 0, (60,60), self.player_graphic)
+        self.player = Player(0, 0, self.player_graphic, ((20,60),(20,60)))
         self.player.x_bounds = (0, self.window_width)
         self.player.y_bounds = (0, self.window_height)
         self.player.move_to_start_pos()
 
-        self.player_bullets = Bullets(20, np.array([20,0]), self.player_bullet_graphic)
+        self.player_bullets = Bullets(20, np.array([20,0]), self.player_bullet_graphic, ((10,60),(8, 16)))
+
+        #Game logic
+        self.game = Game()
 
         self.game_clock = pygame.time.Clock()
         self._running = True
@@ -230,9 +287,14 @@ class App:
         
         #Spawn circle enemies at periodic intervals
         if pygame.time.get_ticks() - self.last_spawn > 1000:
-            self.enemies.append(EnemyCircles(10, (1080, 1200), (200,400), (-2,0), self.enemy_circle_graphic))
+            self.enemies.append(EnemyCircles(10, (1080, 1200), (200,400),
+                 (-2,0), self.enemy_circle_graphic, ((16,62),(16,62))))
             self.last_spawn = pygame.time.get_ticks()
 
+        #Collision detection
+        for enemy in self.enemies:
+            collisions = self.game.detect_bullet_collision(self.player_bullets, enemy)
+            enemy.take_damage(collisions, 1)
 
     def flush_enemies(self):
         '''Remove enemies no longer on the screen'''
@@ -240,9 +302,9 @@ class App:
         for enemy in self.enemies:
             if enemy.on_screen(self.window_width, self.window_height) == True:
                 enemies_to_keep.append(enemy)
-        
+
         self.enemies = enemies_to_keep
-    
+
     def on_render(self):
         self._display_surf.fill((0,0,0))
         self.player_bullets.draw(self._display_surf)
