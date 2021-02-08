@@ -9,14 +9,14 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="60"
-   height="60"
-   viewBox="0 0 60.000001 60"
+   width="70"
+   height="24"
+   viewBox="0 0 70.000001 24"
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="ship.svg"
-   inkscape:export-filename="C:\Users\Stephen\Documents\python\games\sidescrolling_shooter\graphics\ship.png"
+   sodipodi:docname="player_bullet_v2.svg"
+   inkscape:export-filename="C:\Users\Stephen\Documents\python\games\sidescrolling_shooter\graphics\player_bullet.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -34,6 +34,32 @@
        miter_limit="4"
        end_linecap_type="zerowidth"
        cusp_linecap_type="round" />
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter4544"
+       x="-0.108"
+       width="1.216"
+       y="-0.53999996"
+       height="2.0799999">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.5257352"
+         id="feGaussianBlur4546" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter4580"
+       x="-0.035999998"
+       width="1.072"
+       y="-0.18000001"
+       height="1.36">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.75"
+         id="feGaussianBlur4582" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -43,11 +69,11 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.6"
-     inkscape:cx="10.144137"
-     inkscape:cy="33.895092"
+     inkscape:cx="-0.19634438"
+     inkscape:cy="12.18925"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
-     showgrid="true"
+     showgrid="false"
      units="px"
      inkscape:window-width="1366"
      inkscape:window-height="705"
@@ -57,12 +83,13 @@
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
-     fit-margin-bottom="0">
+     fit-margin-bottom="0"
+     showborder="true">
     <inkscape:grid
        type="xygrid"
        id="grid4196"
-       originx="-1.360001"
-       originy="-1.3599546" />
+       originx="6.6254875"
+       originy="-16.718352" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -80,7 +107,14 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-1.3600011,-991.0022)">
+     transform="translate(6.6254873,-1011.6438)">
+    <ellipse
+       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1.12254906;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter4544)"
+       id="path4202-5-4"
+       cx="28.374514"
+       cy="1023.6438"
+       rx="28.063725"
+       ry="5.6127453" />
     <path
        sodipodi:type="star"
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.66535437;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
@@ -99,10 +133,12 @@
        inkscape:transform-center-x="-10.000002"
        transform="matrix(1.1561147,0,0,1.0012247,-93.823393,41.432124)"
        inkscape:transform-center-y="3.1292474e-005" />
-    <path
-       style="fill:#ffffff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 1.3600012,991.00219 59.9999998,30.00001 -59.9999999,30 19.9999999,-30 -19.9999999,-30.00002"
-       id="path4200"
-       inkscape:connector-curvature="0" />
+    <ellipse
+       style="fill:#ffd42a;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter4580)"
+       id="path4202-5"
+       cx="28.374512"
+       cy="1023.6438"
+       rx="25"
+       ry="5" />
   </g>
 </svg>

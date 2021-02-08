@@ -9,13 +9,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="60"
-   height="60"
-   viewBox="0 0 60.000001 60"
+   width="80"
+   height="80"
+   viewBox="0 0 80.000001 80.000001"
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="ship.svg"
+   sodipodi:docname="ship_v2.svg"
    inkscape:export-filename="C:\Users\Stephen\Documents\python\games\sidescrolling_shooter\graphics\ship.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
@@ -34,6 +34,19 @@
        miter_limit="4"
        end_linecap_type="zerowidth"
        cusp_linecap_type="round" />
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter4202"
+       x="-0.14400001"
+       width="1.288"
+       y="-0.14399999"
+       height="1.288">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.6000003"
+         id="feGaussianBlur4204" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -43,8 +56,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.6"
-     inkscape:cx="10.144137"
-     inkscape:cy="33.895092"
+     inkscape:cx="46.929851"
+     inkscape:cy="43.895092"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -61,8 +74,8 @@
     <inkscape:grid
        type="xygrid"
        id="grid4196"
-       originx="-1.360001"
-       originy="-1.3599546" />
+       originx="8.6399991"
+       originy="8.6400455" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -80,7 +93,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-1.3600011,-991.0022)">
+     transform="translate(8.6399989,-981.0022)">
     <path
        sodipodi:type="star"
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.66535437;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
@@ -101,8 +114,13 @@
        inkscape:transform-center-y="3.1292474e-005" />
     <path
        style="fill:#ffffff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 1.3600012,991.00219 59.9999998,30.00001 -59.9999999,30 19.9999999,-30 -19.9999999,-30.00002"
+       d="m 1.3600011,991.00217 59.9999999,30.00003 -59.9999999,30 19.9999999,-30 -19.9999999,-30.00003"
        id="path4200"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:#ffffff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter4202)"
+       d="m 1.3600027,991.00218 59.9999983,30.00002 -59.9999983,30 19.9999983,-30 -19.9999983,-30.00002"
+       id="path4200-4"
        inkscape:connector-curvature="0" />
   </g>
 </svg>

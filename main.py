@@ -34,6 +34,7 @@ class Player:
         self.y = y
         self.shape = shape
         self.image = image
+        self.shape = image.get_size()
 
     def move_to_start_pos(self):
         '''Move to default starting position'''
@@ -67,7 +68,7 @@ class Player:
 
         #Shoot a bullet if enough time has passed since last shot
         if current_time - self.last_shot_time > self.shot_delay:
-            bullets.add_bullet(self.x + self.shape[0]/1.5, self.y + self.shape[1]/2 - bullets.bullet_size[1]/2)
+            bullets.add_bullet(self.x + self.shape[0]/2, self.y + self.shape[1]/2 - bullets.bullet_size[1]/2)
 
             #Update record of last shot
             self.last_shot_time = current_time
@@ -94,6 +95,7 @@ class Bullets:
 
         #Image for each bullet
         self.image = image
+        self.bullet_size = image.get_size()
 
     def appearance(self, image):
         '''Load graphic from file'''
@@ -144,6 +146,7 @@ class EnemyCircles:
 
         #Image for each circle
         self.image = image
+        self.shape = image.get_size()
 
     def appearance(self, image):
         '''Default graphic for each circle'''
@@ -225,7 +228,7 @@ class App:
             self.flush_enemies()
             self.last_flush = pygame.time.get_ticks()
         
-        #Spawn enemies
+        #Spawn circle enemies at periodic intervals
         if pygame.time.get_ticks() - self.last_spawn > 1000:
             self.enemies.append(EnemyCircles(10, (1080, 1200), (200,400), (-2,0), self.enemy_circle_graphic))
             self.last_spawn = pygame.time.get_ticks()
