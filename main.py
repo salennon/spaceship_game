@@ -10,7 +10,9 @@ import itertools
 
 '''
 To do:
-Add collison detection
+Death animation for circles
+Collision detection for player
+Bullet removal
 Unit testing
 '''
 
@@ -82,7 +84,7 @@ class Bullets:
         '''
 
         #Set up array for bullet locations + movement info
-        self.locations = np.full((max_bullets, 2), -100, dtype = int)
+        self.locations = np.full((max_bullets, 2), 1000, dtype = int)
         self.max_bullets = max_bullets
         self.speed = speed
 
@@ -115,6 +117,9 @@ class Bullets:
         for loc in self.locations:
             surface.blit(self.image, loc)
 
+    def absorb_bullets(self, collisions):
+        '''Make enemies absorb bullets on collisions'''
+        self.locations[collisions, :] = np.array([1000, 1000])
 
 class EnemyCircles:
     '''Handle a wave of circle-type enemies using numpy arrays'''
@@ -210,7 +215,8 @@ class Game:
         x_upper_limit = enemy.hitbox[0][1] - bullets.hitbox[0][0]
         y_upper_limit =  enemy.hitbox[1][1] - bullets.hitbox[1][0]
         
-        collisions = np.full(len(enemy.locations), False)
+        enemy_collisions = np.full(len(enemy.locations), False)
+        bullet_collisions = np.full(len(bullets.locations), False)
 
         for i, enemy_loc in enumerate(enemy.locations):
             proximity = bullets.locations - enemy_loc
@@ -220,13 +226,16 @@ class Game:
             #Detect collisions
             x_collision = (x_proximity > x_lower_limit)*(x_proximity < x_upper_limit)
             y_collision = (y_proximity > y_lower_limit)*(y_proximity < y_upper_limit)
-
             is_collision = x_collision*y_collision
 
+            #Register enemy that collided
             if True in is_collision:
-                collisions[i] = True
+                enemy_collisions[i] = True
+
+            #Register bullet that collided
+            bullet_collisions += is_collision
         
-        return collisions
+        return enemy_collisions, bullet_collisions
     
 
 class App:
@@ -293,8 +302,9 @@ class App:
 
         #Collision detection
         for enemy in self.enemies:
-            collisions = self.game.detect_bullet_collision(self.player_bullets, enemy)
-            enemy.take_damage(collisions, 1)
+            enemy_collisions, bullet_collisions = self.game.detect_bullet_collision(self.player_bullets, enemy)
+            enemy.take_damage(enemy_collisions, 1)
+            self.player_bullets.absorb_bullets(bullet_collisions)
 
     def flush_enemies(self):
         '''Remove enemies no longer on the screen'''
