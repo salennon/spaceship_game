@@ -270,8 +270,9 @@ class App:
         self.player.y_bounds = (0, self.window_height)
         self.player.move_to_start_pos()
 
-        self.player_bullets = Bullets(20, np.array([20,0]), self.player_bullet_graphic, ((10,60),(8, 16)))
-
+        #Note hitbox of bullets leans to left, makes enemy hits 'feel right'
+        self.player_bullets = Bullets(20, np.array([20,0]), self.player_bullet_graphic, ((10,45),(8, 16)))
+        
         #Game logic
         self.game = Game()
 
