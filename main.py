@@ -34,11 +34,13 @@ class Player:
     x_bounds = (0, 1080)
     y_bounds = (0, 600)
 
-    def __init__(self, x, y, image, hitbox):
+    def __init__(self, x, y, graphics, hitbox):
         self.x = x
         self.y = y
-        self.image = image
-        self.shape = image.get_size()
+
+        self.graphics = graphics
+        self.shape = self.graphics.image.get_size()
+
         self.hitbox = hitbox
 
     def move_to_start_pos(self):
@@ -46,12 +48,8 @@ class Player:
         self.x = int(self.x_bounds[1]/10)
         self.y = int(self.y_bounds[1]/2) - self.shape[1]/2
 
-    def appearance(self, image):
-        '''Load graphic from file'''
-        self.image = pygame.image.load(image).convert_alpha()
-
     def draw(self, surface):
-        surface.blit(self.image, (self.x, self.y))
+        surface.blit(self.graphics.image, (self.x, self.y))
     
     def move_right(self):
         if self.x + self.speed < self.x_bounds[1] - self.shape[0]:
@@ -83,7 +81,7 @@ class Bullets:
     speed = np.array([0,0])
     bullet_size = (50, 10)
 
-    def __init__(self, max_bullets, speed, image, hitbox):
+    def __init__(self, max_bullets, speed, graphics, hitbox):
         '''
         Speed should be a numpy array: [x_speed, y_speed]
         '''
@@ -97,14 +95,10 @@ class Bullets:
         self.bullet_cycler = itertools.cycle(range(len(self.locations)))
 
         #Image for each bullet
-        self.image = image
-        self.bullet_size = image.get_size()
+        self.graphics = graphics
+        self.bullet_size = self.graphics.image.get_size()
 
         self.hitbox = hitbox
-
-    def appearance(self, image):
-        '''Load graphic from file'''
-        self.image = pygame.image.load(image).convert_alpha()
     
     def add_bullet(self, x, y):
         '''Add bullet at x,y'''
@@ -120,7 +114,7 @@ class Bullets:
         Draw bullets
         '''
         for loc in self.locations:
-            surface.blit(self.image, loc)
+            surface.blit(self.graphics.image, loc)
 
     def absorb_bullets(self, collisions):
         '''Make enemies absorb bullets on collisions'''
@@ -133,7 +127,7 @@ class EnemyCircles:
     shape = (60,60)
     health_per_enemy = 1
 
-    def __init__(self, num_enemies, x_spawn_region, y_spawn_region, avg_velocity, image, hitbox):
+    def __init__(self, num_enemies, x_spawn_region, y_spawn_region, avg_velocity, graphics, hitbox):
         '''
         Generate a wave of num_enemies circle enemies in a spawn region specifed by x_spawn_region and y_spawn_region
         '''
@@ -154,22 +148,18 @@ class EnemyCircles:
                  avg_velocity[1] + self.yvel_spread, size = self.num_enemies)
         self.velocities = np.vstack((xvel, yvel)).transpose()
 
-        #Image for each circle
-        self.image = image
-        self.shape = image.get_size()
+        #Graphics for each circle
+        self.graphics = graphics
+        self.shape = self.graphics.image.get_size()
 
         self.hitbox = hitbox
-
-    def appearance(self, image):
-        '''Default graphic for each circle'''
-        self.image = pygame.image.load(image).convert_alpha()
 
     def update(self):
         self.locations = self.locations + self.velocities
 
     def draw(self, surface):
         for loc in self.locations:
-            surface.blit(self.image, loc)
+            surface.blit(self.graphics.image, loc)
     
     def on_screen(self, window_width, window_height):
         '''
@@ -247,6 +237,11 @@ class Graphics:
 
     graphic = None
 
+    def __init__(self, image_file):
+        
+        #Load default appearance
+        self.image = pygame.image.load(image_file).convert_alpha()
+
     def load_death_animation(self, directory):
         '''
         Load series of death animation images from a directory
@@ -256,7 +251,6 @@ class Graphics:
         png_files = [f for f in files if f.endswith('.png')]
         png_files = Graphics.sort_files(png_files)
         filepaths = [f'{directory}/{fname}' for fname in png_files]
-        print(filepaths)
 
         #Load files into pygame
         death_frames = [pygame.image.load(f).convert_alpha() for f in filepaths]
@@ -332,9 +326,9 @@ class App:
                                     self.window_height), pygame.HWSURFACE)
 
         #Load in graphics
-        self.player_graphic = pygame.image.load('graphics/ship.png').convert_alpha()
-        self.player_bullet_graphic = pygame.image.load('graphics/player_bullet.png').convert_alpha()
-        self.enemy_circle_graphic = pygame.image.load('graphics/circle.png').convert_alpha()
+        self.player_graphic = Graphics('graphics/ship.png')
+        self.player_bullet_graphic = Graphics('graphics/player_bullet.png')
+        self.enemy_circle_graphic = Graphics('graphics/circle.png')
 
         #Player instance, properties etc.
         self.player = Player(0, 0, self.player_graphic, ((20,60),(20,60)))
