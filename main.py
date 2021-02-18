@@ -7,6 +7,8 @@ import pygame
 import time
 import numpy as np
 import itertools
+import os
+import re
 
 '''
 To do:
@@ -14,7 +16,10 @@ Death animation for circles
 Collision detection for player
 Bullet removal
 Unit testing
+Refactoring - class polymorphism
 '''
+
+
 
 
 class Player:
@@ -238,6 +243,73 @@ class Game:
         return enemy_collisions, bullet_collisions
     
 
+class Graphics:
+
+    graphic = None
+
+    def load_death_animation(self, directory):
+        '''
+        Load series of death animation images from a directory
+        '''
+        #Get png images in directory and sort
+        files = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+        png_files = [f for f in files if f.endswith('.png')]
+        png_files = Graphics.sort_files(png_files)
+        filepaths = [f'{directory}/{fname}' for fname in png_files]
+        print(filepaths)
+
+        #Load files into pygame
+        death_frames = [pygame.image.load(f).convert_alpha() for f in filepaths]
+        self.death_animation = death_frames
+            
+    @staticmethod
+    def sort_files(files):
+        '''
+        Sort list of filenames alpha-numerically
+        Method credit: https://stackoverflow.com/questions/4836710/is-there-a-built-in-function-for-string-natural-sort
+        ''' 
+        convert = lambda text: int(text) if text.isdigit() else text 
+        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+        return sorted(files, key = alphanum_key)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class App:
     '''Application loops'''
     
@@ -263,7 +335,7 @@ class App:
         self.player_graphic = pygame.image.load('graphics/ship.png').convert_alpha()
         self.player_bullet_graphic = pygame.image.load('graphics/player_bullet.png').convert_alpha()
         self.enemy_circle_graphic = pygame.image.load('graphics/circle.png').convert_alpha()
- 
+
         #Player instance, properties etc.
         self.player = Player(0, 0, self.player_graphic, ((20,60),(20,60)))
         self.player.x_bounds = (0, self.window_width)
