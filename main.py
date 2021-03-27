@@ -160,6 +160,7 @@ class EnemyCircles:
 
     def update(self):
         self.locations = self.locations + self.velocities
+        self.death_locations = self.death_locations + self.velocities
 
         #Cycle through death animation frames
         self.death_frames = (self.death_frames + 1)
@@ -292,40 +293,6 @@ class Graphics:
         convert = lambda text: int(text) if text.isdigit() else text 
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
         return sorted(files, key = alphanum_key)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
