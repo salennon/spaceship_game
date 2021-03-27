@@ -13,13 +13,12 @@ import re
 '''
 To do:
 Death animation for circles
+Need to add time for death animation to finish before removing enemies
 Collision detection for player
 Bullet removal
 Unit testing
 Refactoring - class polymorphism
 '''
-
-
 
 
 class Player:
@@ -133,6 +132,11 @@ class EnemyCircles:
         '''
         self.num_enemies = num_enemies
 
+        #Arrays for handling death animations
+        self.death_locations = np.full((num_enemies, 2), -1000)
+        self.death_frames = np.full(num_enemies, 0)
+        self.num_death_frames = graphics.num_death_frames
+
         #Generate health for each enemy in wave
         self.health = np.full(self.num_enemies, self.health_per_enemy)
 
@@ -157,9 +161,19 @@ class EnemyCircles:
     def update(self):
         self.locations = self.locations + self.velocities
 
+        #Cycle through death animation frames
+        self.death_frames = (self.death_frames + 1)
+
     def draw(self, surface):
         for loc in self.locations:
             surface.blit(self.graphics.image, loc)
+
+        for i, d_loc in enumerate(self.death_locations):
+            #get death frames for each animation - don't let frame exceed number
+            #of frames animation actually has
+            death_frame = min(self.death_frames[i], self.num_death_frames - 1)
+            death_image = self.graphics.death_animation[death_frame]
+            surface.blit(death_image, d_loc) 
     
     def on_screen(self, window_width, window_height):
         '''
@@ -180,12 +194,21 @@ class EnemyCircles:
         '''
         Make enemies take damage based on collisions
         '''
+        #Check for already dead enemies
+        self.dead_enemies = self.health < 1
+
         damage_taken = collisions*damage_amount
         self.health = self.health - damage_taken
 
-        #Check for dead enemies
-        dead_enemies = self.health < 1
-        self.locations[dead_enemies, :] = np.array([-1000,-1000])
+        new_deaths = (self.health < 1) * np.logical_not(self.dead_enemies)
+
+        #Record locations of deaths for death animation
+        self.death_locations[new_deaths, :] = self.locations[new_deaths, :]
+        self.death_frames[new_deaths] = 0
+
+        #Move rendering of live enemy off-screen
+        self.locations[new_deaths, :] = np.array([-1000,-1000])
+
 
 class Game:
     ''' Handle game logic'''
@@ -255,6 +278,10 @@ class Graphics:
         #Load files into pygame
         death_frames = [pygame.image.load(f).convert_alpha() for f in filepaths]
         self.death_animation = death_frames
+    
+    @property
+    def num_death_frames(self):
+        return len(self.death_animation)
             
     @staticmethod
     def sort_files(files):
@@ -329,6 +356,8 @@ class App:
         self.player_graphic = Graphics('graphics/ship.png')
         self.player_bullet_graphic = Graphics('graphics/player_bullet.png')
         self.enemy_circle_graphic = Graphics('graphics/circle.png')
+
+        self.enemy_circle_graphic.load_death_animation('graphics/circle_death')
 
         #Player instance, properties etc.
         self.player = Player(0, 0, self.player_graphic, ((20,60),(20,60)))
