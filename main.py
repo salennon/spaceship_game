@@ -12,7 +12,8 @@ import re
 
 '''
 To do:
-Death animation for circles
+Refactor
+Add config file for params like resolution
 Need to add time for death animation to finish before removing enemies
 Collision detection for player
 Bullet removal
